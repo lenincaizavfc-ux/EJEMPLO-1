@@ -1,0 +1,13 @@
+{
+  "name": "cristiano-ronaldo-page",
+  "version": "1.0.0",
+  "description": "Pagina web dedicada a Cristiano Ronaldo",
+  "scripts": {
+    "test:html": "node tests/validate-html.js",
+    "test:a11y": "node tests/check-accessibility.js",
+    "test:responsive": "node tests/check-responsive.js",
+    "test:links": "node tests/check-links.js",
+    "test": "node tests/validate-html.js && node tests/check-accessibility.js && node tests/check-responsive.js && node tests/check-links.js"
+  },
+  "devDependencies": {}
+}

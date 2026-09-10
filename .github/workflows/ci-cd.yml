@@ -1,0 +1,71 @@
+name: CI/CD — Pruebas y Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # ============================
+  # FASE 1: PRUEBAS
+  # ============================
+  test:
+    name: Validaciones y Pruebas
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validacion HTML5
+        run: node tests/validate-html.js
+
+      - name: Accesibilidad WCAG AA
+        run: node tests/check-accessibility.js
+
+      - name: Responsividad / Adaptabilidad
+        run: node tests/check-responsive.js
+
+      - name: Seguridad de Enlaces Externos
+        run: node tests/check-links.js
+
+  # ============================
+  # FASE 2: DEPLOY A GITHUB PAGES
+  # ============================
+  deploy:
+    name: Deploy a GitHub Pages
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact de la pagina
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './paginaCristianoRonaldo'
+
+      - name: Deploy a GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
